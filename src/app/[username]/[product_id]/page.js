@@ -1,6 +1,6 @@
 // Ubicación: app/[username]/[product_id]/page.js
 
-import { supabase } from '../../../lib/supabaseClient'
+import { supabase } from '@/lib/supabaseClient'
 
 export default async function ProductPage({ params }) {
   const { product_id } = await params
