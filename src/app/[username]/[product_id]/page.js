@@ -26,24 +26,32 @@ export default async function ProductPage({ params }) {
     .limit(3)
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>{product.title}</h1>
-      <img src={product.image_url} alt={product.title} style={{ maxWidth: '300px' }} />
-      <p>{product.description}</p>
-      
-      <a href={product.profiles.whatsapp_link} target="_blank" style={{ display: 'block', margin: '20px 0', padding: '10px', background: '#25D366', color: 'white', textAlign: 'center', borderRadius: '8px' }}>
-        Contactar en WhatsApp
-      </a>
+    <div className="min-h-screen bg-[#FDFBF7] p-6 text-[#4A4A4A]">
+      <div className="max-w-md mx-auto bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
+        <img src={product.image_url} alt={product.title} className="w-full h-64 object-cover" />
+        
+        <div className="p-6">
+          <h1 className="text-2xl font-semibold text-stone-800">{product.title}</h1>
+          <p className="mt-2 text-stone-600">{product.description}</p>
+          <p className="mt-4 text-xl font-bold text-stone-900">${product.price}</p>
+          
+          <a 
+            href={product.profiles.whatsapp_link} 
+            target="_blank" 
+            className="block mt-6 py-3 bg-[#E8F5E9] text-[#2E7D32] text-center font-medium rounded-2xl hover:bg-[#C8E6C9] transition-colors"
+          >
+            Contactar por WhatsApp
+          </a>
+        </div>
+      </div>
 
-      {/* Sección de Descubrimiento Contextual */}
-      <section>
-        <h3>Te podría interesar</h3>
-        <div style={{ display: 'flex', gap: '10px' }}>
+      <section className="max-w-md mx-auto mt-8">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-stone-400 mb-4">Te podría interesar</h3>
+        <div className="grid grid-cols-2 gap-4">
           {relatedProducts?.map(item => (
-            <div key={item.id} style={{ border: '1px solid #ddd', padding: '10px', borderRadius: '8px' }}>
-              <p>{item.title}</p>
-              <a href={`/${product.profiles.username}/${item.id}`}>Ver detalle</a>
-            </div>
+            <a key={item.id} href={`/${product.profiles.username}/${item.id}`} className="bg-white p-4 rounded-2xl border border-stone-100 hover:shadow-md transition-shadow">
+              <p className="text-sm font-medium text-stone-700">{item.title}</p>
+            </a>
           ))}
         </div>
       </section>
