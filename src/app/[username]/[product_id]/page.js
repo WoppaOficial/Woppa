@@ -6,7 +6,7 @@ export default async function ProductPage({ params }) {
   const { product_id } = await params
 
   // 1. Consultar el producto actual y los datos de su perfil
-  const { data: product, error } = await supabase
+const { data: product, error } = await supabase
     .from('products')
     .select(`
       *, 
@@ -14,14 +14,15 @@ export default async function ProductPage({ params }) {
       product_tags(tag_id),
       product_options(*), 
       product_complements(complements(*)) 
-  ` )
+    `)
     .eq('id', product_id)
-    .single()
+    .single();
 
     console.log("Datos cargados:", product);
 
-  if (error || !product) {
-    return <div className="p-10 text-center text-stone-500">Producto no encontrado</div>
+  if (error) {
+    console.error("Error detallado de Supabase:", error); // Esto aparecerá en tu terminal
+    return <div className="p-10 text-center">Error: {error.message}</div>; // Esto aparecerá en tu pantalla
   }
 
   // 2. Obtener IDs de etiquetas del producto actual para la comparación
