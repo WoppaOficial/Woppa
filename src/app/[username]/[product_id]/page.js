@@ -7,16 +7,23 @@ export default async function ProductPage({ params }) {
 
   // 1. Consultar el producto actual y los datos de su perfil
 const { data: product, error } = await supabase
-    .from('products')
-    .select(`
-      *, 
-      profiles(username, whatsapp_link), 
-      product_tags(tag_id),
-      product_options(*), 
-      product_complements(complements(*)) 
-    `)
-    .eq('id', product_id)
-    .single();
+  .from('products')
+  .select(`
+    *, 
+    profiles(username, whatsapp_link), 
+    product_tags(tag_id),
+    product_options(*), 
+    product_complements(
+      complements (
+        id,
+        title,
+        price,
+        image_url
+      )
+    )
+  `)
+  .eq('id', product_id)
+  .single();
 
     console.log("Datos cargados:", product);
 
