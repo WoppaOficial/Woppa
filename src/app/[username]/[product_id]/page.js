@@ -8,9 +8,17 @@ export default async function ProductPage({ params }) {
   // 1. Consultar el producto actual y los datos de su perfil
   const { data: product, error } = await supabase
     .from('products')
-    .select('*, profiles(username, whatsapp_link), product_tags(tag_id)')
+    .select(`
+      *, 
+      profiles(username, whatsapp_link), 
+      product_tags(tag_id),
+      product_options(*), 
+      product_complements(complements(*)) 
+  ` )
     .eq('id', product_id)
     .single()
+
+    console.log("Datos cargados:", product);
 
   if (error || !product) {
     return <div className="p-10 text-center text-stone-500">Producto no encontrado</div>
@@ -71,6 +79,7 @@ export default async function ProductPage({ params }) {
           ))}
         </div>
       </section>
+      
     </div>
   )
 }
