@@ -14,19 +14,31 @@ const { data: product, error } = await supabase
     product_tags(tag_id),
     product_options(*), 
     product_complements(
-      complements (
-        id,
-        title,
-        price,
-        image_url
+      complement_id
       )
-    )
   `)
   .eq('id', product_id)
   .single();
 
-    console.log("Datos cargados:", product);
+// SI AUN ASI NO VIENEN LOS DATOS DEL COMPLEMENTO:
+// Vamos a traer los detalles del complemento en una segunda consulta rápida
+let complementsData = [];
+if (product && product.product_complements.length > 0) {
+  const compIds = product.product_complements.map(pc => pc.complement_id);
+  const { data } = await supabase
+    .from('complements')
+    .select('*')
+    .in('id', compIds);
+  complementsData = data;
+}
 
+// Ahora, combina los datos manualmente antes de usarlos
+const productWithComplements = {
+  ...product,
+  complements: complementsData
+};
+
+    console.log("Datos finales combinados:", productWithComplements);
   if (error) {
     console.error("Error detallado de Supabase:", error); // Esto aparecerá en tu terminal
     return <div className="p-10 text-center">Error: {error.message}</div>; // Esto aparecerá en tu pantalla
