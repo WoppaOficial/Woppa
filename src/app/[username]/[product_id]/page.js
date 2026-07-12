@@ -6,25 +6,26 @@ export default async function ProductPage({ params }) {
   const { product_id } = await params
 
 // 1. Obtener producto y opciones básicas
-const { data: product, error } = await supabase
-  .from('products')
-  .select('*, profiles(username, whatsapp_link), product_tags(tag_id), product_options(*)')
-  .eq('id', product_id)
-  .single();
+// 1. Obtener producto
+  const { data: product, error: prodError } = await supabase
+    .from('products')
+    .select('id, title, price, description, image_url')
+    .eq('id', product_id)
+    .single();
 
-// 2. Obtener manualmente los complementos mediante su relación intermedia
-const { data: rawComplements } = await supabase
-  .from('product_complements')
-  .select('complement_id, complements(*)')
-  .eq('product_id', product_id);
+  // 2. Diagnóstico de OPCIONES
+  const { data: allOptions } = await supabase.from('product_options').select('*');
+  console.log("--- TODAS LAS OPCIONES EN DB ---", allOptions);
+  
+  const { data: filteredOptions } = await supabase
+    .from('product_options')
+    .select('*')
+    .eq('product_id', product_id);
+  console.log("--- OPCIONES FILTRADAS POR ID ---", filteredOptions);
 
-// 3. Combinar todo manualmente
-const finalData = {
-  ...product,
-  complements: rawComplements ? rawComplements.map(item => item.complements) : []
-};
-
-console.log("Datos finales corregidos:", finalData);
+  // 3. Diagnóstico de COMPLEMENTOS
+  const { data: allComplementsLinks } = await supabase.from('product_complements').select('*');
+  console.log("--- TODOS LOS LINKS DE COMPLEMENTOS ---", allComplementsLinks);
 
   if (error) {
     console.error("Error detallado de Supabase:", error); // Esto aparecerá en tu terminal
