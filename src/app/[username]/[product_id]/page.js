@@ -5,40 +5,27 @@ export default async function ProductPage({ params }) {
   // Resolvemos los params (necesario en versiones recientes de Next.js)
   const { product_id } = await params
 
-  // 1. Consultar el producto actual y los datos de su perfil
+// 1. Obtener producto y opciones básicas
 const { data: product, error } = await supabase
   .from('products')
-  .select(`
-    *, 
-    profiles(username, whatsapp_link), 
-    product_tags(tag_id),
-    product_options(*), 
-    product_complements(
-      complement_id
-      )
-  `)
+  .select('*, profiles(username, whatsapp_link), product_tags(tag_id), product_options(*)')
   .eq('id', product_id)
   .single();
 
-// SI AUN ASI NO VIENEN LOS DATOS DEL COMPLEMENTO:
-// Vamos a traer los detalles del complemento en una segunda consulta rápida
-let complementsData = [];
-if (product && product.product_complements.length > 0) {
-  const compIds = product.product_complements.map(pc => pc.complement_id);
-  const { data } = await supabase
-    .from('complements')
-    .select('*')
-    .in('id', compIds);
-  complementsData = data;
-}
+// 2. Obtener manualmente los complementos mediante su relación intermedia
+const { data: rawComplements } = await supabase
+  .from('product_complements')
+  .select('complement_id, complements(*)')
+  .eq('product_id', product_id);
 
-// Ahora, combina los datos manualmente antes de usarlos
-const productWithComplements = {
+// 3. Combinar todo manualmente
+const finalData = {
   ...product,
-  complements: complementsData
+  complements: rawComplements ? rawComplements.map(item => item.complements) : []
 };
 
-    console.log("Datos finales combinados:", productWithComplements);
+console.log("Datos finales corregidos:", finalData);
+
   if (error) {
     console.error("Error detallado de Supabase:", error); // Esto aparecerá en tu terminal
     return <div className="p-10 text-center">Error: {error.message}</div>; // Esto aparecerá en tu pantalla
